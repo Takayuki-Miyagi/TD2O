@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import sys
 import readline
 import numpy as np
 #
@@ -8,29 +9,58 @@ import TransitionDensity
 
 def main():
     # interactive
-    readline.parse_and_bind("tab: complete")
-    print("Insert a file name of operator: ")
-    file_op = input()
-    print("Insert operator rank J: ")
-    op_rankJ = int(input())
-    print("Insert operator rank P (1 or -1): ")
-    op_rankP = int(input())
-    if(op_rankP != -1 and op_rankP != 1):
-        print("Parity of operator has to be 1 or -1")
-        exit()
-    print("Insert operator rank Z: ")
-    op_rankZ = int(input())
+    if(len(sys.argv) == 1):
+        readline.parse_and_bind("tab: complete")
+        print("Insert a file name of operator: ")
+        file_op = input()
+        print("Insert operator rank J: ")
+        op_rankJ = int(input())
+        print("Insert operator rank P (1 or -1): ")
+        op_rankP = int(input())
+        if(op_rankP != -1 and op_rankP != 1):
+            print("Parity of operator has to be 1 or -1")
+            exit()
+        print("Insert operator rank Z: ")
+        op_rankZ = int(input())
 
-    print("Insert a file name of transition densities: ")
-    file_td = input()
-    print("Insert bra state J: ")
-    Jbra = int(input())
-    print("Insert ket state J: ")
-    Jket = int(input())
-    print("Insert label of wave function for bra state: ")
-    wf_label_bra = int(input())
-    print("Insert label of wave function for ket state: ")
-    wf_label_ket = int(input())
+        print("Insert a file name of transition densities: ")
+        file_td = input()
+        print("Insert bra state J: ")
+        Jbra = int(input())
+        print("Insert ket state J: ")
+        Jket = int(input())
+        print("Insert label of wave function for bra state: ")
+        wf_label_bra = int(input())
+        print("Insert label of wave function for ket state: ")
+        wf_label_ket = int(input())
+        f = open('input_calc_observable','w')
+        f.write(file_op+'\n')
+        f.write(str(op_rankJ)+'\n')
+        f.write(str(op_rankP)+'\n')
+        f.write(str(op_rankZ)+'\n')
+        f.write(file_td+'\n')
+        f.write(str(Jbra)+'\n')
+        f.write(str(Jket)+'\n')
+        f.write(str(wf_label_bra)+'\n')
+        f.write(str(wf_label_ket)+'\n')
+        f.close()
+    if(len(sys.argv) == 2):
+        f = open(sys.argv[1],'r')
+        lines = f.readlines()
+        f.close()
+        file_op = lines[0].split('\n')[0]
+        op_rankJ = int(lines[1])
+        op_rankP = int(lines[2])
+        op_rankZ = int(lines[3])
+        file_td = lines[4].split('\n')[0]
+        Jbra = int(lines[5])
+        Jket = int(lines[6])
+        wf_label_bra = int(lines[7])
+        wf_label_ket = int(lines[8])
+
+    if(len(sys.argv) > 3):
+        print("Too many argumetns: stop!")
+        sys.exit()
 
     print('')
     print(' main (calculation for the observable using transition density)')
@@ -42,6 +72,21 @@ def main():
     Op.read_operator_file()
     TD.read_td_file()
     TD.set_orbits(Op.orbs)
+    zero,one,two = calc_observable(Op,TD)
+    prt = ''
+    prt += '# \n'
+    prt += '# Calculation using: \n'
+    prt += '# ' + file_op + '\n'
+    prt += '# ' + file_td + '\n'
+    prt += '# \n'
+    prt += '# zero-body one-body two-body Total \n'
+    prt += '  {0:.4f}   {1:.4f}  {2:.4f}  {3:.4f}'.format(zero,one,two,zero+one+two)
+    print(prt)
+    f = open("TD2O.output",'w')
+    f.write(prt)
+    f.close()
+
+def calc_observable(Op,TD):
     orbs = Op.orbs
 
     zero = Op.zero
@@ -50,7 +95,7 @@ def main():
         oa = orbs.get_orbit(a)
         for b in range(1,orbs.norbs+1):
             ob = orbs.get_orbit(b)
-            if(op_rankJ == 0 and op_rankZ ==0):
+            if(Op.rankJ == 0 and Op.rankZ ==0):
                 one += Op.get_obme(a,b) * TD.get_obtd(a,b,Op.rankJ,Op.rankZ) * \
                         np.sqrt(oa.j+1) / np.sqrt(2*Jbra+1)
             else:
@@ -72,21 +117,13 @@ def main():
                         for Jcd in range( int(abs(oc.j-od.j)/2), int((oc.j+od.j)/2+1)):
                             if(c == d and Jcd%2 == 1): continue
                             if(not abs(Jab-Jcd) <= Op.rankJ <= (Jab+Jcd)): continue
-                            if(op_rankJ == 0 and op_rankZ ==0):
+                            if(Op.rankJ == 0 and Op.rankZ ==0):
                                 two += Op.get_tbme(a,b,c,d,Jab,Jcd) * TD.get_tbtd(a,b,c,d,Jab,Jcd,Op.rankJ,Op.rankZ) * \
                                         np.sqrt(2*Jab+1)/np.sqrt(2*Jbra+1)
 
                             else:
                                 two += Op.get_tbme(a,b,c,d,Jab,Jcd) * TD.get_tbtd(a,b,c,d,Jab,Jcd,Op.rankJ,Op.rankZ)
-    print('')
-    print('Calculation using: ')
-    print(file_op)
-    print(file_td)
-    print('')
-    print('zero-body contribution = {:.4f}'.format(zero))
-    print(' one-body contribution = {:.4f}'.format(one))
-    print(' two-body contribution = {:.4f}'.format(two))
-    print('                 Total = {:.4f}'.format(zero+one+two))
+    return zero,one,two
 
 if(__name__ == "__main__"):
     main()

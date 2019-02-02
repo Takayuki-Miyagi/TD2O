@@ -38,7 +38,7 @@ class Operator:
         if((b,a) in self.one): v = self.one[(b,a)]; ex_bk = True
         fact = 1.0
         if(ex_bk):
-            fact *= (-1.0) ** ((ob.j - oa.j)/2)
+            fact *= (-1.0) ** ((oa.j - ob.j)/2)
         try:
             return v * fact
         except:
@@ -77,7 +77,7 @@ class Operator:
         if((d,c,b,a,Jcd,Jab) in self.two): v = self.two[(d,c,b,a,Jcd,Jab)]; ex_ab = True; ex_cd = True; ex_bk = True
 
         fact = 1.0
-        if(ex_bk): fact *= (-1.0) ** (Jcd-Jab)
+        if(ex_bk): fact *= (-1.0) ** (Jab-Jcd)
         if(ex_ab): fact *= self._get_phase(a,b,Jab)
         if(ex_cd): fact *= self._get_phase(c,d,Jcd)
         try:
