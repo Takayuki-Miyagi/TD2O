@@ -30,7 +30,7 @@ class TransitionDensity:
         try:
             return self.one[abj]
         except:
-            print("Warning: not found one-body transition density: (a,b)=", a, b)
+            #print("Warning: not found one-body transition density: (a,b)=", a, b)
             return 0.0
 
     def _get_phase(self,a,b,Jab):
@@ -64,7 +64,7 @@ class TransitionDensity:
         try:
             return v * fact
         except:
-            print("Warning: not found two-body transition density: (a,b,c,d,Jab,Jcd)=",a,b,c,d,Jab,Jcd)
+            #print("Warning: not found two-body transition density: (a,b,c,d,Jab,Jcd)=",a,b,c,d,Jab,Jcd)
             return 0.0
 
     def read_td_file(self):
