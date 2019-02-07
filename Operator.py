@@ -1,4 +1,4 @@
-import Orbit
+from . import Orbit
 class Operator:
     def __init__(self, file_op, rankJ, rankP, rankZ):
         self.zero = 0.0
@@ -93,9 +93,12 @@ class Operator:
         b = True
         while b == True:
             line = f.readline()
+            if(line[0:11] == "! Zero body"):
+                data = line.split()
+                self.zero = float(data[4])
             b = line.startswith("!")
         data = line.split()
-        for i in range(int(data[2])+int(data[3])):
+        for i in range(int(data[0])+int(data[1])):
             line = f.readline()
             data = line.split()
             idx, n, l, j, z = int(data[0]), int(data[1]), int(data[2]), int(data[3]), int(data[4])

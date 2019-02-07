@@ -1,4 +1,4 @@
-import Orbit
+from . import Orbit
 class TransitionDensity:
     def __init__(self, file_td, Jbra, Jket, wfbra, wfket):
         self.one = {}
@@ -70,6 +70,8 @@ class TransitionDensity:
     def read_td_file(self):
         f = open(self.file_td, 'r')
 
+        self._find_label(f)
+
         tf = False
         while tf == False:
             line = f.readline()
@@ -114,9 +116,19 @@ class TransitionDensity:
                         int(data[10]), int(data[11]), float(data[13])
                 self.set_tbtd(a,b,c,d,Jab,Jcd,Jr,me)
         f.close()
+    def _find_label(self,f):
+        tf = False
+        while tf == False:
+            line = f.readline()
+            if(line[0:4] == 'w.f.'):
+                data = line.split()
+                i_bra = int(data[3][:-1])
+                i_ket = int(data[6][:-1])
+                if(i_bra == self.wfbra and i_ket == self.wfket): return
+
 
 def main():
-    file_td="TD-file-name"
+    file_td="transition-density-file-name"
     Jbra = 0
     Jket = 0
     wfbra = 1

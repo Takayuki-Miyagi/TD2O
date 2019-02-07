@@ -3,9 +3,9 @@ import sys
 import readline
 import numpy as np
 #
-import Orbit
-import Operator
-import TransitionDensity
+from . import Orbit
+from . import Operator
+from . import TransitionDensity
 
 def main():
     # interactive
@@ -73,11 +73,13 @@ def main():
     TD.read_td_file()
     TD.set_orbits(Op.orbs)
     zero,one,two = calc_observable(Op,TD)
+
     prt = ''
     prt += '# \n'
     prt += '# Calculation using: \n'
     prt += '# ' + file_op + '\n'
     prt += '# ' + file_td + '\n'
+    prt += '# n-bra = {0:3d}, n-ket = {1:3d}\n'.format(TD.wfbra,TD.wfket)
     prt += '# \n'
     prt += '# zero-body one-body two-body Total \n'
     prt += '  {0:.4f}   {1:.4f}  {2:.4f}  {3:.4f}'.format(zero,one,two,zero+one+two)
@@ -88,6 +90,7 @@ def main():
 
 def calc_observable(Op,TD):
     orbs = Op.orbs
+    print(Op.zero)
 
     zero = Op.zero
     one = 0.0
@@ -97,7 +100,7 @@ def calc_observable(Op,TD):
             ob = orbs.get_orbit(b)
             if(Op.rankJ == 0 and Op.rankZ ==0):
                 one += Op.get_obme(a,b) * TD.get_obtd(a,b,Op.rankJ,Op.rankZ) * \
-                        np.sqrt(oa.j+1) / np.sqrt(2*Jbra+1)
+                        np.sqrt(oa.j+1) / np.sqrt(2*TD.Jbra+1)
             else:
                 one += Op.get_obme(a,b) * TD.get_obtd(a,b,Op.rankJ,Op.rankZ)
 
@@ -119,7 +122,7 @@ def calc_observable(Op,TD):
                             if(not abs(Jab-Jcd) <= Op.rankJ <= (Jab+Jcd)): continue
                             if(Op.rankJ == 0 and Op.rankZ ==0):
                                 two += Op.get_tbme(a,b,c,d,Jab,Jcd) * TD.get_tbtd(a,b,c,d,Jab,Jcd,Op.rankJ,Op.rankZ) * \
-                                        np.sqrt(2*Jab+1)/np.sqrt(2*Jbra+1)
+                                        np.sqrt(2*Jab+1)/np.sqrt(2*TD.Jbra+1)
 
                             else:
                                 two += Op.get_tbme(a,b,c,d,Jab,Jcd) * TD.get_tbtd(a,b,c,d,Jab,Jcd,Op.rankJ,Op.rankZ)
