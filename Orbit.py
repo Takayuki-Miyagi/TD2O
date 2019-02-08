@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 class Orbit:
     def __init__(self):
         self.n = -1

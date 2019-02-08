@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from . import Orbit
 class Operator:
     def __init__(self, file_op, rankJ, rankP, rankZ):

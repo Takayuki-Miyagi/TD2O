@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from . import Orbit
 class TransitionDensity:
     def __init__(self, file_td, Jbra, Jket, wfbra, wfket):
