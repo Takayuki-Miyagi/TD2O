@@ -90,7 +90,6 @@ def main():
 
 def calc_observable(Op,TD):
     orbs = Op.orbs
-    print(Op.zero)
 
     zero = Op.zero
     one = 0.0
